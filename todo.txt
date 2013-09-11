@@ -1,6 +1,0 @@
-TODO:
-
-1. Write simple function with two methods to work with traffic and phrases
-2. Commit changes to GitHub
-3. Plan next iteraion
-
