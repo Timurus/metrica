@@ -1,0 +1,45 @@
+{
+rows: 2,
+counters: [
+{
+site: "jjlabs.ru",
+code_status: "CS_OK",
+permission: "own",
+name: "jjlabs",
+id: "21854962",
+type: "simple",
+owner_login: "darkolorin"
+},
+{
+site: "volternews.ru",
+code_status: "CS_OK",
+permission: "own",
+name: "Газета "Вольтер"",
+id: "13044085",
+type: "simple",
+owner_login: "darkolorin"
+}
+]
+}
+
+
+
+
+
+
+https://oauth.yandex.ru/authorize?response_type=token&client_id=1ca6aac10e684687b8d4022933069218
+
+2eec9d0e55bb4cddb69227ffa7fb05e0   -  token
+
+
+id jjlabs.ru
+21854962
+
+#get counters
+http://api-metrika.yandex.ru/counters.json?pretty=1&oauth_token=2eec9d0e55bb4cddb69227ffa7fb05e0
+
+#get stat 
+http://api-metrika.yandex.ru/stat/sources/summary?id=21854962&date1=20130801&date2=20130901&pretty=1&oauth_token=2eec9d0e55bb4cddb69227ffa7fb05e0
+
+#detail traffic
+http://api-metrika.yandex.ru/stat/traffic/summary?id=21854962&date1=20130801&date2=20130901&per_page=100&pretty=1&oauth_token=2eec9d0e55bb4cddb69227ffa7fb05e0
