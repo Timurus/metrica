@@ -5,40 +5,19 @@ QueryBuilder <- function() {
   end.date     <- NULL
   profile.id   <- NULL
   access_token <- NULL
+  method       <- NULL
   
   StartDate <- function(start.date.param = NA) {
-    # Sets the start date.
-    # Optional.
-    # All Analytics feed requests must specify a beginning and ending date
-    # range. If you do not indicate start- and end-date values for the
-    # request, the server returns a request error.
-    # Date values are in the form YYYY-MM-DD.
-    # The earliest valid start-date is 2005-01-01. There is no upper limit
-    # restriction for a start-date. However, setting a start-date that is
-    # too  far in the future will most likely return empty results.
-    #
-    #  Args:
-    #    start.date.param: Optional. A start date of the form "YYYY-MM-DD"
-    #                      as a string. If NULL is used, the start.date
-    #                      parameter will be unset. If no parameter is
-    #                      specified, the current start.date value is
-    #                      returned.
-    #
-    #  Returns:
-    #    The start.date value if start.date.param is not set.
-    # Un-set the parameter if the value NULL is used.
+    
     if (is.null(start.date.param)) {
       start.date <<- NULL
       return(invisible())
     }
     
-    # Returns the current dimension value if no parameter is used.
     if (is.na(start.date.param)) {
       return(start.date)
     }
     
-    # Error handling.
-    # Check the form of the start.date.param.
     if (is.na(as.Date(start.date.param, "%Y%m%d"))) {
       stop("A start date must be specified of the form YYYYMMDD")
     }
@@ -48,38 +27,16 @@ QueryBuilder <- function() {
   }
   
   EndDate <- function(end.date.param = NA) {
-    # Sets the end date.
-    # Optional.
-    # All Analytics feed requests must specify a beginning and ending date
-    # range. If you do not indicate start- and end-date values for the
-    # request, the server returns a request error.
-    # Date values are in the form YYYY-MM-DD.
-    # The earliest valid start-date is 2005-01-01. There is no upper limit
-    # restriction for a start-date. However, setting a start-date that is
-    # too far in the future will most likely return empty results.
-    #
-    #  Args:
-    #    end.date.param: An end date of the form 'YYYY-MM-DD'
-    #                    as a string. If NULL is used, the end.date.param
-    #                    parameter will be unset. If no parameter is specified,
-    #                    the current end.date value is returned.
-    #
-    #  Returns:
-    #    The end.date value if end.date.param is not set.
-    
-    # Un-set the parameter if the value NULL is used.
+  
     if (is.null(end.date.param)) {
       end.date <<- NULL
       return(invisible())
     }
     
-    # Returns the current dimension value if no parameter is used.
     if (is.na(end.date.param)) {
       return(end.date)
     }
     
-    # Error handling.
-    # Check the form of the end.date.param.
     if (is.na(as.Date(end.date.param, "%Y%m%d"))) {
       stop("An end date must be specified of the form YYYYMMDD")
     }
@@ -88,5 +45,109 @@ QueryBuilder <- function() {
     return(invisible())
   }
   
+  Profile <- function(profile.id.param){
+    
+    if (is.null(profile.id.param)) {
+      profile.id <<- NULL
+      return(invisible())
+    }
+    
+    if(is.na(profile.id.param)){
+      return(profile.id)
+    }
+    
+    profile.id <<-profile.id.param
+    return(invisible())
+  }
+  
+  AccessToken <- function(access_token.param){
+    if (is.null(access_token.param)) {
+      access_token <<- NULL
+      return(invisible())
+    }
+    
+    if(is.na(access_token.param)){
+      return(access_token)
+    }
+    
+    access_token <<-access_token.param
+    return(invisible())
+  }
+  
+  #Function for choosing method for Yandex Metrica API
+  Method <- function(method.param){
+    
+    if(method.param == 1)
+      method <- "traffic/summary?"
+    else
+      method <- "sources/phrases?"
+  }
+  
+  ClearData <- function() {
+  
+    start.date  <<- NULL
+    end.date    <<- NULL
+    method      <<- NULL
+    profile.id  <<- NULL
+    access_token <<- NULL
+    return(invisible())
+  }
+  
+  ToUri <- function() {
+    
+    query <- c("profile.id"  = profile.id,
+               "start.date"  = start.date,
+               "end.date"    = end.date,
+               "access_token" = access_token)
+    
+    uri <- paste("http://api-metrika.yandex.ru/stat/",method,"&pretty=1",collapse=TRUE)
+    for (name in names(query)) {
+      uri.name <- switch(name,
+                         profile.id = "id",
+                         start.date  = "date1",
+                         end.date    = "date2",
+                         access_token = "oauth_token")
+      
+      if (!is.null(uri.name)) {
+        uri <- paste(uri,
+                     uri.name,
+                     "=",
+                     curlEscape(query[[name]]),
+                     "&",
+                     sep = "",
+                     collapse= "")
+      }
+    }
+
+    uri <- sub("&$", "", uri)
+    
+    uri <- gsub("\\s", "", uri)
+    
+    return(uri)
+  }
+  
+  Init <- function(profile.id = NULL,
+                   start.date  = NULL,
+                   end.date    = NULL,
+                   method = NULL,
+                   access_token = NULL) {
+    
+    StartDate(start.date)
+    EndDate(end.date)
+    Profile(prfile.id)
+    AccessToken(access_token)
+    Method(method)
+    
+    return(invisible())
+  }
+  
+  return(list("start.date"     =   StartDate,
+              "end.date"     =   EndDate,
+              "profile"      = Profile,
+              "method"       = Method,
+              "to.uri"       =   ToUri,   
+              "clear.data"   =   ClearData,
+              "access_token" =   AccessToken,			  
+              "Init"         =   Init,))
   
 }
