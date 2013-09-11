@@ -1,3 +1,5 @@
+library("RCurl")
+
 #Basic query for phrases and traffic
 QueryBuilder <- function() {
   
@@ -45,7 +47,7 @@ QueryBuilder <- function() {
     return(invisible())
   }
   
-  Profile <- function(profile.id.param){
+  Profile <- function(profile.id.param = NA){
     
     if (is.null(profile.id.param)) {
       profile.id <<- NULL
@@ -78,9 +80,11 @@ QueryBuilder <- function() {
   Method <- function(method.param){
     
     if(method.param == 1)
-      method <- "traffic/summary?"
+      method <<- "traffic/summary?"
     else
-      method <- "sources/phrases?"
+      method <<- "sources/phrases?"
+    
+    return(invisible())
   }
   
   ClearData <- function() {
@@ -100,7 +104,7 @@ QueryBuilder <- function() {
                "end.date"    = end.date,
                "access_token" = access_token)
     
-    uri <- paste("http://api-metrika.yandex.ru/stat/",method,"&pretty=1",collapse=TRUE)
+    uri <- paste("http://api-metrika.yandex.ru/stat/",method,"pretty=1&",collapse=NULL)
     for (name in names(query)) {
       uri.name <- switch(name,
                          profile.id = "id",
@@ -134,7 +138,7 @@ QueryBuilder <- function() {
     
     StartDate(start.date)
     EndDate(end.date)
-    Profile(prfile.id)
+    Profile(profile.id)
     AccessToken(access_token)
     Method(method)
     
@@ -143,11 +147,15 @@ QueryBuilder <- function() {
   
   return(list("start.date"     =   StartDate,
               "end.date"     =   EndDate,
-              "profile"      = Profile,
+              "profile.id"      = Profile,
               "method"       = Method,
               "to.uri"       =   ToUri,   
               "clear.data"   =   ClearData,
               "access_token" =   AccessToken,			  
-              "Init"         =   Init,))
+              "Init"         =   Init))
   
 }
+
+q <- QueryBuilder()
+q$Init(start.date="20130801",end.date="20130901", profile.id="13044085",method=1,access_token="2eec9d0e55bb4cddb69227ffa7fb05e0")
+
